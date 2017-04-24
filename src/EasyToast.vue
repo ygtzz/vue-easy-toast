@@ -8,7 +8,7 @@
       :transition="mergedOption.transition"
       v-show="showing"
       >
-      <span class="et-content" v-html="mergedOption.message"></span>
+      <span class="et-content" v-html="mergedOption.msg"></span>
       </div>
     </transition>
   </div>
@@ -16,11 +16,11 @@
 <style>
   .et-wrapper {
     background-color: rgba(48, 45, 55, 0.7);
-    border-radius: 5px;
-    padding: 10px 30px;
+    border-radius: 10px;
+    padding: 20px 60px;
     display: inline-block;
-    max-width: 300px;
-    min-width: 120px;
+    max-width: 600px;
+    min-width: 240px;
     color: white;
     z-index: 9999;
     margin: auto;
@@ -52,6 +52,15 @@
   .et-wrapper.et-bottom {
       top: auto;
       bottom: 0;
+  }
+  .et-wrapper.et-middle{
+      top:50%;
+      transform: translateY(-50%);
+  }
+  .et-wrapper.et-center-middle{
+      top:45%;
+      left:50%;
+      transform: translate(-50%,-50%);
   }
   .et-wrapper.et-alert {
     background-color: rgba(189, 19, 19, 0.7);
@@ -128,12 +137,13 @@
   const DEFAULT_OPT = {
     id: 'easy-toast-default',
     className: '',
-    horizontalPosition: 'right',
-    verticalPosition: 'top',
+    horizontalPosition: 'center',
+    verticalPosition: 'middle',
     parent: 'body',
     transition: 'fade',
-    duration: 5000,
-    message: ''
+    duration: 2000,
+    msg: '',
+    callback:''
   }
   export default {
     DEFAULT_OPT: DEFAULT_OPT,
@@ -164,13 +174,17 @@
                 clazz = clazz.concat(className)
             }
         }
-
-        if(horizontalPosition){
-            clazz.push(`et-${horizontalPosition}`)
+        if(horizontalPosition == 'center' && verticalPosition == 'middle'){
+            clazz.push('et-center-middle');
         }
+        else{
+            if(horizontalPosition){
+                clazz.push(`et-${horizontalPosition}`)
+            }
 
-        if(verticalPosition){
-            clazz.push(`et-${verticalPosition}`)
+            if(verticalPosition){
+                clazz.push(`et-${verticalPosition}`)
+            }
         }
 
         return clazz.join(' ')
@@ -196,6 +210,11 @@
             this.timeoutId = null
             setTimeout(() => this.queue.shift())
           }, this.mergedOption.duration * pending)
+        }
+      },
+      showing:function(val){
+        if(!val && this.mergedOption.callback){
+          this.mergedOption.callback();
         }
       }
     }

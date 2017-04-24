@@ -6,8 +6,29 @@ export default {
     const CACHE = {}
     Object.assign(EasyToastVue.DEFAULT_OPT, defaultOptions)
 
-    function toast(msg, options = {}) {
-      options.message = msg
+    function toast() {
+      const args = arguments,
+            toString = Object.prototype.toString;
+      let options = {},
+          msg = '',
+          callback = '';
+      if(toString.call(args[0]) == '[object String]' && 
+         toString.call(args[1]) == '[object Object]'){
+          msg = args[0];
+          options = args[1];
+      }
+      else if(toString.call(args[0]) == '[object String]' &&
+              toString.call(args[1]) == '[object Function]'
+      ){
+          msg = args[0];
+          callback = args[1],
+          options = args[2] || {};
+          options.callback = callback;
+      }
+      else{
+          throw new Error('component toast: params is not correct');
+      }
+      options.msg = msg;
       let toast = CACHE[options.id] || (CACHE[options.id] = new CONSTRUCTOR)
       if (!toast.$el) {
         let vm = toast.$mount()
